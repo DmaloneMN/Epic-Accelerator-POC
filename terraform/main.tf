@@ -56,8 +56,8 @@ resource "azurerm_healthcare_fhir_service" "fhir" {
   workspace_id        = azurerm_log_analytics_workspace.workspace.id
 
   authentication {
-    authority           = "https://login.microsoftonline.com/<your-tenant-id>"
-    audience            = "https://<your-audience>"
+    authority           = "https://login.microsoftonline.com/${var.tenant-id}"
+    audience            = var.audience
     smart_proxy_enabled = false
   }
 }
