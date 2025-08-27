@@ -25,39 +25,27 @@ resource "azurerm_storage_account" "storage" {
   account_replication_type = "LRS"
 }
 
-resource "azurerm_service_plan" "plan" {
+resource "azurerm_app_service_plan" "plan" {
   name                = "epic-accelerator-plan"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  os_type             = "Windows"
-  sku_name            = "S1"
+  sku {
+    tier = "Standard"
+    size = "S1"
+  }
 }
 
 resource "azurerm_app_service" "app" {
   name                = "epic-accelerator-app"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  app_service_plan_id = azurerm_service_plan.plan.id
-}
-
-resource "azurerm_log_analytics_workspace" "workspace" {
-  name                = "epic-healthcare-workspace"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  sku                 = "PerGB2018"
-  retention_in_days   = 30
+  app_service_plan_id = azurerm_app_service_plan.plan.id
 }
 
 resource "azurerm_healthcare_fhir_service" "fhir" {
   name                = "epic-fhir-service"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
+  workspace_name      = "epic-healthcare-workspace"
   kind                = "fhir-R4"
-  workspace_id        = azurerm_log_analytics_workspace.workspace.id
-
-  authentication {
-    authority           = "https://login.microsoftonline.com/${var.tenant_id}"
-    audience            = var.audience
-    smart_proxy_enabled = false
-  }
 }
