@@ -17,54 +17,10 @@ resource "azurerm_resource_group" "rg" {
   location = "East US"
 }
 
-resource "azurerm_storage_account" "storage" {
-  name                     = "epicacceleratorstorage"
-  resource_group_name      = azurerm_resource_group.rg.name
-  location                 = azurerm_resource_group.rg.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-}
-
-resource "azurerm_service_plan" "plan" {
-  name                = "epic-accelerator-plan"
-  location            = azurerm_resource_group.rg.location
+module "epic_accelerator" {
+  source              = "./modules/epic_accelerator"
   resource_group_name = azurerm_resource_group.rg.name
-  os_type             = "Windows"
-  sku_name            = "F1"  # Free tier for testing
-}
-
-resource "azurerm_app_service" "app" {
-  name                = "epic-accelerator-app"
   location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  app_service_plan_id = azurerm_service_plan.plan.id
-}
-
-resource "azurerm_windows_web_app" "app" {
-  name                = "epic-accelerator-app"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  service_plan_id     = azurerm_service_plan.plan.id
-
-  site_config {
-    always_on = true
-  }
-
-  identity {
-    type = "SystemAssigned"
-  }
-}
-
-resource "azurerm_healthcare_fhir_service" "fhir" {
-  name                = "epic-fhir-service"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  kind                = "fhir-R4"
-  workspace_id        = azurerm_healthcare_apis_workspace.workspace.id
-
-  authentication {
-    authority           = "https://login.microsoftonline.com/${var.tenant_id}"
-    audience            = var.audience
-    smart_proxy_enabled = false
-  }
+  tenant_id           = var.tenant_id
+  audience            = var.audience
 }
