@@ -38,7 +38,7 @@ resource "azurerm_windows_web_app" "app" {
 }
 
 resource "azurerm_healthcare_workspace" "workspace" {
-  name                = "epic-healthcare-workspace"
+  name                = "htealthws01"
   location            = var.location
   resource_group_name = var.resource_group_name
 }
