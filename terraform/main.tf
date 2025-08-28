@@ -40,10 +40,19 @@ resource "azurerm_app_service" "app" {
   app_service_plan_id = azurerm_service_plan.plan.id
 }
 
-resource "azurerm_healthcare_apis_workspace" "workspace" {
-  name                = "epic-healthcare-workspace"
+resource "azurerm_windows_web_app" "app" {
+  name                = "epic-accelerator-app"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
+  service_plan_id     = azurerm_service_plan.plan.id
+
+  site_config {
+    always_on = true
+  }
+
+  identity {
+    type = "SystemAssigned"
+  }
 }
 
 resource "azurerm_healthcare_fhir_service" "fhir" {
